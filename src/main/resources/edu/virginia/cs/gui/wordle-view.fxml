@@ -11,13 +11,18 @@
 <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="edu.virginia.cs.gui.WordleController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="5.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
 
-    <GridPane fx:id = "grid" alignment="CENTER"/>
+    <GridPane fx:id = "grid" alignment="BASELINE_CENTER" prefHeight="350.0"/>
     <Label fx:id="errorLabel"/>
     <Label fx:id="gameResult"/>
+    <Button fx:id="yesButton" mnemonicParsing="false" text="Yes"/>
+    <Button fx:id="noButton" mnemonicParsing="false" text="No"/>
     <TextField id="enteredText" fx:id = "enteredWord" onKeyPressed="#onTextEntryEnter"
-               prefHeight="37.0" prefWidth="50.0" text="" />
+               prefHeight="30.0" prefWidth="10.0" alignment="TOP_LEFT"/>
+
+    <Label fx:id="playAgain"/>
+
 </VBox>

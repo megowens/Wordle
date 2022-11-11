@@ -18,8 +18,7 @@ public class WordleApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(WordleApplication.class.getResource("wordle-view.fxml"));
         stage.setTitle("WORDLE");
-        Scene scene = new Scene(fxmlLoader.load(), 400, 500);
-        //scene.setFill(Color.BLACK);
+        Scene scene = new Scene(fxmlLoader.load(), 400, 600);
         stage.setScene(scene);
         stage.show();
     }
