@@ -16,21 +16,22 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import java.util.List;
 
 public class WordleController {
     @FXML
     private Wordle wordle = new WordleImplementation();
     @FXML
     private GridPane grid = new GridPane();
-    @FXML
-    Label errorLabel = new Label();
+    //@FXML
+    //Label errorLabel = new Label();
     @FXML
     private TextField enteredWord;
     @FXML
-    private Label gameResult = new Label();
+    private Label displayMessage = new Label();
     @FXML
     private Label playAgain = new Label();
+    @FXML
+    private Label startText = new Label();
     @FXML
     private Button yesButton = new Button("Yes");
     @FXML
@@ -45,12 +46,12 @@ public class WordleController {
         playAgain.setVisible(false);
         yesButton.setVisible(false);
         noButton.setVisible(false);
-        //grid.setGridLinesVisible(true);
+        startText.setText("Welcome! Enter a 5 letter word.");
         createGrid();
     }
 
     private void reset(){
-        gameResult.setText("");
+        displayMessage.setText("");
         grid.getChildren().clear();
         enteredWord.setText("");
         enteredWord.setVisible(true);
@@ -58,6 +59,7 @@ public class WordleController {
         wordle = new WordleImplementation();
         yesButton.setVisible(false);
         noButton.setVisible(false);
+        startText.setVisible(true);
         r = 0;
     }
     @FXML
@@ -72,16 +74,6 @@ public class WordleController {
         @Override
         public void handle(ActionEvent event) {
             System.exit(0);
-        }
-    };
-
-
-    @FXML
-    EventHandler<KeyEvent> letterTyped = new EventHandler<KeyEvent>() {
-        @Override
-        public void handle(KeyEvent event) {
-            squares[r][col+1].requestFocus();
-            event.consume();
         }
     };
 
@@ -104,74 +96,72 @@ public class WordleController {
             rc.setValignment(VPos.CENTER);
             grid.getRowConstraints().add(rc);
         }
-         /*
-        for(int i = 0; i < 6; i++) {
-            for(int j = 0; j < 5; j++){
-                squares[i][j] = new TextField();
-                grid.add(squares[i][j], j, i);
-            }
-        }
-
-          */
         grid.setAlignment(Pos.CENTER);
         grid.setMinSize(100, 300);
         grid.setStyle("-fx-padding: 2; -fx-hgap: 2; fx-vgap:1 ;");
-        //grid.setSnapToPixel(false);
-
     }
     @FXML
     protected void onTextEntryEnter(KeyEvent event) {
-        gameResult.setText("");
-        //grid.setOnKeyPressed(letterTyped);
+        displayMessage.setText("");
+        startText.setVisible(false);
         if(wordle.getRemainingGuesses()<1) {
-            enteredWord.setVisible(false);
-            playAgain.setVisible(true);
-            gameResult.setText("no guesses remaining. Answer was: " + wordle.getAnswer());
-            playAgain.setText("Play again? Y/N");
-            yesButton.setVisible(true);
-            noButton.setVisible(true);
-            //ynPlayAgain();
-            yesButton.setOnAction(eventY);
-            noButton.setOnAction(eventN);
+            noGuesses();
         }
         else if(event.getCode().equals(KeyCode.ENTER)){
             try {
                 enteredWord.setText(enteredWord.getText().strip());
                 guessResult = wordle.submitGuess(enteredWord.getText());
-                errorLabel.setText("");
                 if(wordle.isWin()) {
-                    playAgain.setVisible(true);
-                    enteredWord.setVisible(false);
-                    gameResult.setText("Correct! Answer was : " + wordle.getAnswer());
-                    playAgain.setText("Play again?");
-                    yesButton.setVisible(true);
-                    noButton.setVisible(true);
-                    //ynPlayAgain();
-                    yesButton.setOnAction(eventY);
-                    noButton.setOnAction(eventN);
+                    gameWon();
                 }
-                for(int i = 0; i < 5; i++) {
-                    Label letterToAdd = new Label();
-                    letterToAdd.setPrefSize(40.0, 50.0);
-                    letterToAdd.setText(String.valueOf(enteredWord.getText().charAt(i)));
-                    if(guessResult[i].equals(LetterResult.YELLOW)){
-                        letterToAdd.setBackground(new Background(new BackgroundFill(Color.YELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
-                    }
-                    else if(guessResult[i].equals(LetterResult.GREEN)){
-                        letterToAdd.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-                    }
-                    else if(guessResult[i].equals(LetterResult.GRAY)){
-                        letterToAdd.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
-                    }
-                    letterToAdd.setStyle("-fx-alignment: center;");
-                    grid.add(letterToAdd, i, r);
-                }
+                displayGuess();
                 enteredWord.setText("");
                 r++;
             }catch(IllegalWordException e) {
-                errorLabel.setText("word is invalid: enter a valid 5 letter word");
+                displayMessage.setText("word is invalid: enter a valid 5 letter word");
                 enteredWord.setText("");
             }
         }
+    }
+
+    private void displayGuess() {
+        for(int i = 0; i < 5; i++) {
+            Label letterToAdd = new Label();
+            letterToAdd.setPrefSize(40.0, 50.0);
+            letterToAdd.setText(String.valueOf(enteredWord.getText().charAt(i)));
+            if(guessResult[i].equals(LetterResult.YELLOW)){
+                letterToAdd.setBackground(new Background(new BackgroundFill(Color.YELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
+            }
+            else if(guessResult[i].equals(LetterResult.GREEN)){
+                letterToAdd.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+            }
+            else if(guessResult[i].equals(LetterResult.GRAY)){
+                letterToAdd.setBackground(new Background(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY)));
+            }
+            letterToAdd.setStyle("-fx-alignment: center;");
+            grid.add(letterToAdd, i, r);
+        }
+    }
+
+    private void gameWon() {
+        playAgain.setVisible(true);
+        enteredWord.setVisible(false);
+        displayMessage.setText("Correct! Answer was : " + wordle.getAnswer());
+        playAgain.setText("Play again?");
+        yesButton.setVisible(true);
+        noButton.setVisible(true);
+        yesButton.setOnAction(eventY);
+        noButton.setOnAction(eventN);
+    }
+
+    private void noGuesses() {
+        enteredWord.setVisible(false);
+        playAgain.setVisible(true);
+        displayMessage.setText("No guesses remaining. Answer was: " + wordle.getAnswer());
+        playAgain.setText("Play again?");
+        yesButton.setVisible(true);
+        noButton.setVisible(true);
+        yesButton.setOnAction(eventY);
+        noButton.setOnAction(eventN);
     }
 }
